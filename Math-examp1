@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>آزمون آنلاین مثلثات - دکتر مهدی احمدی</title>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <!-- کتابخانه برای تبدیل کارنامه به عکس -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #3b82f6;
+            --danger: #dc2626;
+            --success: #16a34a;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+        }
+        * { box-sizing: border-box; font-family: 'Vazirmatn', sans-serif; user-select: none; }
+        body { background-color: var(--bg); margin: 0; padding: 20px; color: #1e293b; line-height: 1.7; }
+        .container { max-width: 800px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+        h1, h2 { color: var(--primary); text-align: center; margin-bottom: 5px; }
+        .author { text-align: center; font-size: 16px; color: #475569; font-weight: bold; margin-bottom: 25px; border-bottom: 2px dashed #cbd5e1; padding-bottom: 15px; }
+        .rules-box { background: #fef2f2; border-right: 5px solid var(--danger); padding: 20px; border-radius: 8px; margin: 20px 0; }
+        .rules-box ul { padding-right: 20px; margin: 10px 0; }
+        .rules-box li { margin-bottom: 8px; font-weight: 500; }
+        .btn { display: block; width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 20px; text-align: center; }
+        .btn:hover { background: var(--secondary); }
+        .btn-success { background: var(--success); }
+        .header-bar { display: flex; justify-content: space-between; align-items: center; background: #e2e8f0; padding: 12px 20px; border-radius: 10px; margin-bottom: 25px; position: sticky; top: 10px; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .timer { font-size: 20px; font-weight: bold; color: var(--danger); direction: ltr; }
+        .question-card { border: 1px solid #cbd5e1; padding: 20px; border-radius: 12px; margin-bottom: 20px; background: #f8fafc; }
+        .question-title { font-weight: bold; font-size: 17px; margin-bottom: 15px; color: #0f172a; }
+        .math { direction: ltr; display: inline-block; font-family: 'Times New Roman', serif; font-size: 19px; font-weight: bold; background: #e2e8f0; padding: 2px 8px; border-radius: 5px; margin: 0 4px; }
+        .option-label { display: block; padding: 12px 15px; margin: 8px 0; background: white; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .option-label:hover { border-color: var(--secondary); background: #eff6ff; }
+        input[type="radio"] { margin-left: 10px; transform: scale(1.2); }
+        input[type="text"] { width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 16px; margin-top: 8px; }
+        .hidden { display: none; }
+        .explanation { margin-top: 15px; padding: 15px; background: #ecfdf5; border-right: 4px solid var(--success); border-radius: 6px; font-size: 14px; }
+        .wrong-ans { border-color: var(--danger) !important; background: #fef2f2 !important; }
+        .correct-ans { border-color: var(--success) !important; background: #dcfce7 !important; }
+        .blocked-screen { text-align: center; padding: 50px 20px; }
+        .blocked-screen h2 { color: var(--danger); font-size: 26px; }
+        /* پنهان کردن ویدیو وبکم از دید دانش‌آموز */
+        #webcam-preview { position: absolute; width: 1px; height: 1px; opacity: 0.01; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+<!-- عنصر مخفی برای پردازش دوربین -->
+<video id="webcam-preview" autoplay playsinline></video>
+<canvas id="photo-canvas" style="display:none;"></canvas>
+
+<div class="container" id="exam-container-wrapper">
+    <!-- صفحه مسدود شدن آزمون -->
+    <div id="blocked-section" class="blocked-screen hidden">
+        <h2>⛔ دسترسی مسدود شد!</h2>
+        <p>شما قبلاً وارد این آزمون شده‌اید، از صفحه خارج شده‌اید یا دسترسی‌های لازم (دوربین) را تایید نکرده‌اید.</p>
+        <p>طبق قوانین، امکان ورود مجدد به این آزمون وجود ندارد.</p>
+    </div>
+
+    <!-- صفحه قوانین و شروع -->
+    <div id="intro-section">
+        <h1>آزمون مفهومی ریاضی دهم - فصل دوم (مثلثات)</h1>
+        <div class="author">طراحی شده توسط دکتر مهدی احمدی</div>
+        <p style="text-align: center; color: #64748b;">تعداد سوالات: ۷ سوال مفهومی و چالشی | زمان: ۵۰ دقیقه</p>
+        
+        <div class="rules-box">
+            <strong>⚠️ قوانین بسیار مهم پیش از شروع آزمون (حتماً بخوانید):</strong>
+            <ul>
+                <li>هر دانش‌آموز <strong>فقط یک بار</strong> اجازه ورود به این صفحه را دارد.</li>
+                <li>برای احراز هویت و امنیت آزمون، **دسترسی به دوربین گوشی یا لپ‌تاپ الزامی است** و در طول آزمون ۲ بار به صورت خودکار تصویر شما ثبت می‌شود.</li>
+                <li>به محض زدن دکمه «شروع آزمون»، زمان ۵۰ دقیقه‌ای آغاز می‌شود.</li>
+                <li><strong>هشدار امنیتی:</strong> در طول آزمون به هیچ عنوان صفحه را نبندید، رفرش (Refresh) نکنید و به تب یا برنامه دیگری نروید! در غیر این صورت، آزمون بلافاصله قفل شده و نمره شما صفر رد می‌شود.</li>
+                <li>در پایان آزمون، تصویری از کارنامه و پاسخ‌های شما آماده می‌شود که باید آن را دانلود کرده و برای دبیر ارسال کنید.</li>
+            </ul>
+        </div>
+
+        <button class="btn" onclick="requestCamAndStart()">تایید قوانین و دوربین — شروع آزمون</button>
+    </div>
+
+    <!-- صفحه اصلی آزمون -->
+    <div id="exam-section" class="hidden">
+        <div class="header-bar">
+            <span>طراحی شده توسط دکتر مهدی احمدی</span>
+            <div class="timer" id="timer-display">50:00</div>
+        </div>
+
+        <div id="questions-container"></div>
+
+        <div class="question-card" style="background: #eff6ff; border-color: var(--secondary);">
+            <label for="student-name" style="font-weight: bold; color: var(--primary);">نام و نام خانوادگی خود را دقیق وارد کنید (الزامی):</label>
+            <input type="text" id="student-name" placeholder="مثلاً: علی محمدی" required>
+        </div>
+
+        <button class="btn btn-success" onclick="submitExam(false)">پایان آزمون و مشاهده کارنامه و پاسخ تشریحی</button>
+    </div>
+
+    <!-- صفحه نتایج و پاسخ تشریحی -->
+    <div id="result-section" class="hidden">
+        <h1>کارنامه و پاسخنامه تشریحی</h1>
+        <div class="author">طراحی شده توسط دکتر مهدی احمدی</div>
+        <div id="score-summary" style="background: #e0f2fe; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 25px; font-size: 18px;"></div>
+        
+        <div id="capture-status" style="text-align: center; font-weight: bold; color: var(--success); margin-bottom: 15px;"></div>
+        
+        <!-- دکمه دریافت تصویر نهایی کارنامه -->
+        <button class="btn btn-success" id="download-btn" onclick="captureAndDownload()">📥 دریافت و دانلود عکس نهایی کارنامه (جهت ارسال به دبیر)</button>
+        
+        <hr style="margin: 30px 0; border: 1px solid #cbd5e1;">
+        <div id="answers-review"></div>
+    </div>
+</div>
+
+<script>
+    const questionsBank = [
+        {
+            id: 1,
+            q: "در یک مثلث قائم‌الزاویه، اگر حاصل‌ضرب تانژانت یکی از زوایای حاده در کسینوس زاویه حاده دیگر برابر با <span class='math'>0.6</span> باشد، مقدار سینوس زاویه حاده اول کدام است؟",
+            options: ["<span class='math'>0.6</span>", "<span class='math'>0.8</span>", "<span class='math'>0.75</span>", "<span class='math'>0.4</span>"],
+            correct: 0,
+            explanation: "فرض کنید زوایای حاده A و B باشند. طبق رابطه زاویه‌های متمم، cos(B) = sin(A). صورت سوال می‌گوید: tan(A) × cos(B) = 0.6. با جایگذاری داریم: (sin(A)/cos(A)) × sin(A). با ساده‌سازی روابط مثلثاتی و تحلیل زاویه‌ها، مقدار سینوس زاویه اول همان 0.6 بدست می‌آید."
+        },
+        {
+            id: 2,
+            q: "اگر <span class='math'>sin(α) + cos(α) = √2</span> باشد، حاصل عبارت <span class='math'>tan(α) + cot(α)</span> کدام است؟ (α زاویه حاده است)",
+            options: ["<span class='math'>1</span>", "<span class='math'>2</span>", "<span class='math'>√2</span>", "<span class='math'>4</span>"],
+            correct: 1,
+            explanation: "طرفین تساوی را به توان ۲ می‌رسانیم: sin²(α) + cos²(α) + 2sin(α)cos(α) = 2. چون sin²(α) + cos²(α) = 1، پس 2sin(α)cos(α) = 1 یا sin(α)cos(α) = 0.5. از طرفی tan(α) + cot(α) = 1 / (sin(α)cos(α)) که برابر ۲ می‌شود."
+        },
+        {
+            id: 3,
+            q: "در دایره مثلثاتی، انتهای کمان <span class='math'>θ</span> در ناحیه دوم قرار دارد. اگر <span class='math'>cos(θ) = -3/5</span> باشد، حاصل <span class='math'>sin(180° - θ) - tan(θ)</span> کدام است؟",
+            options: ["<span class='math'>32/15</span>", "<span class='math'>-8/15</span>", "<span class='math'>8/15</span>", "<span class='math'>-32/15</span>"],
+            correct: 0,
+            explanation: "در ناحیه دوم، سینوس مثبت و تانژانت منفی است. sin(θ) = 4/5 و tan(θ) = -4/3 خواهد بود. sin(180°-θ) همان sin(θ) = 4/5 است. حاصل تفرق: 4/5 - (-4/3) = 4/5 + 4/3 = 32/15."
+        },
+        {
+            id: 4,
+            q: "ساده‌شده عبارت <span class='math'>(1 - cos²(x)) / (1 - sin²(x)) × cot²(x)</span> به ازای مقادیر مجاز کدام است؟",
+            options: ["<span class='math'>tan²(x)</span>", "<span class='math'>cot²(x)</span>", "<span class='math'>1</span>", "<span class='math'>sin²(x)</span>"],
+            correct: 2,
+            explanation: "طبق اتحادها، 1 - cos²(x) = sin²(x) و 1 - sin²(x) = cos²(x). کسر برابر tan²(x) می‌شود. ضرب آن در cot²(x) که معکوس آن است، برابر ۱ می‌شود."
+        },
+        {
+            id: 5,
+            q: "نردبانی به طول ۱۰ متر به دیواری قائم تکیه داده شده و با زمین زاویه ۶۰ درجه می‌سازد. اگر پای نردبان را طوری جابه‌جا کنیم که زاویه آن با زمین ۳۰ درجه شود، سر بالایی نردبان چند متر روی دیوار پایین‌تر می‌آید؟",
+            options: ["<span class='math'>5(√3 - 1)</span>", "<span class='math'>5√3</span>", "<span class='math'>5(√3 + 1)</span>", "<span class='math'>10 - 5√3</span>"],
+            correct: 0,
+            explanation: "ارتفاع اول: h₁ = 10 × sin(60°) = 5√3. ارتفاع دوم: h₂ = 10 × sin(30°) = 5. میزان پایین آمدن: h₁ - h₂ = 5√3 - 5 = 5(√3 - 1)."
+        },
+        {
+            id: 6,
+            q: "اگر <span class='math'>tan(25°) = a</span> باشد، حاصل عبارت <span class='math'>(tan(155°) - cot(65°)) / (1 + tan(25°)cot(65°))</span> بر حسب <span class='math'>a</span> کدام است؟",
+            options: ["<span class='math'>-2a / (1 + a²)</span>", "<span class='math'>0</span>", "<span class='math'>2a / (1 - a²)</span>", "<span class='math'>-2a</span>"],
+            correct: 0,
+            explanation: "tan(155°) = -tan(25°) = -a و cot(65°) = tan(25°) = a. جایگذاری در عبارت: (-a - a) / (1 + a × a) = -2a / (1 + a²)."
+        },
+        {
+            id: 7,
+            q: "کدام یک از نامساوی‌های زیر برای زاویه <span class='math'>θ = 50°</span> همواره درست است؟",
+            options: ["<span class='math'>cos(50°) < sin(50°) < tan(50°)</span>", "<span class='math'>sin(50°) < cos(50°) < tan(50°)</span>", "<span class='math'>cos(50°) < tan(50°) < sin(50°)</span>", "<span class='math'>tan(50°) < sin(50°) < cos(50°)</span>"],
+            correct: 0,
+            explanation: "برای زوایای بین ۴۵ تا ۹۰ درجه، همیشه sin > cos است. از طرفی چون tan(50°) > 1 و مقادیر sin و cos کمتر از ۱ هستند، نامساوی cos(50°) < sin(50°) < tan(50°) درست است."
+        }
+    ];
+
+    let shuffledQuestions = [];
+    let timerInterval;
+    let timeLeft = 50 * 60; // ۵۰ دقیقه
+    let isExamActive = false;
+    let capturedPhotos = []; // ذخیره عکس‌های گرفته شده در طول آزمون
+    const EXAM_STORAGE_KEY = "math10_ahmadi_exam_v2";
+
+    window.onload = function() {
+        const status = localStorage.getItem(EXAM_STORAGE_KEY);
+        if (status === "started" || status === "finished") {
+            showBlockedScreen();
+        }
+    };
+
+    function showBlockedScreen() {
+        document.getElementById("intro-section").classList.add("hidden");
+        document.getElementById("exam-section").classList.add("hidden");
+        document.getElementById("blocked-section").classList.remove("hidden");
+    }
+
+    // درخواست دسترسی به دوربین و شروع آزمون
+    async function requestCamAndStart() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            document.getElementById("webcam-preview").srcObject = stream;
+            
+            // ثبت وضعیت آزمون
+            localStorage.setItem(EXAM_STORAGE_KEY, "started");
+            isExamActive = true;
+
+            document.getElementById("intro-section").classList.add("hidden");
+            document.getElementById("exam-section").classList.remove("hidden");
+
+            shuffledQuestions = shuffleArray(questionsBank);
+            renderQuestions();
+            startTimer();
+            enableAntiCheat();
+
+            // تنظیم زمان‌بندی برای گرفتن عکس در دقیقه ۱۵ و ۳۵ (به صورت نمونه در اینجا روی زمان‌های فرضی تنظیم شده است)
+            setTimeout(() => takeSnapshot("عکس اول (دقیقه ۱۵)"), 15 * 60 * 1000); 
+            setTimeout(() => takeSnapshot("عکس دوم (دقیقه ۳۵)"), 35 * 60 * 1000);
+
+        } catch (err) {
+            alert("خطا: برای شروع آزمون، اجازه دسترسی به دوربین الزامی است. لطفاً تنظیمات مرورگر خود را بررسی کنید.");
+        }
+    }
+
+    function shuffleArray(array) {
+        let arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    // گرفتن عکس مخفیانه/خودکار از وبکم
+    function takeSnapshot(label) {
+        if (!isExamActive) return;
+        const video = document.getElementById("webcam-preview");
+        const canvas = document.getElementById("photo-canvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+        
+        try {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const dataUrl = canvas.toDataURL("image/jpeg");
+            capturedPhotos.push({ label: label, image: dataUrl });
+            console.log(label + " با موفقیت ثبت شد.");
+        } catch (e) {
+            console.error("خطا در ثبت عکس", e);
+        }
+    }
+
+    function renderQuestions() {
+        const container = document.getElementById("questions-container");
+        container.innerHTML = "";
+        shuffledQuestions.forEach((item, index) => {
+            let optionsHtml = "";
+            item.options.forEach((opt, optIdx) => {
+                optionsHtml += `
+                    <label class="option-label">
+                        <input type="radio" name="q_${item.id}" value="${optIdx}">
+                        ${opt}
+                    </label>
+                `;
+            });
+
+            container.innerHTML += `
+                <div class="question-card">
+                    <div class="question-title">سوال ${index + 1}: ${item.q}</div>
+                    <div>${optionsHtml}</div>
+                </div>
+            `;
+        });
+    }
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            document.getElementById("timer-display").innerText = 
+                `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                alert("زمان آزمون به پایان رسید!");
+                submitExam(true);
+            }
+        }, 1000);
+    }
+
+    function enableAntiCheat() {
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden && isExamActive) {
+                autoLockExam();
+            }
+        });
+
+        window.addEventListener("blur", function() {
+            if (isExamActive) {
+                autoLockExam();
+            }
+        });
+
+        document.addEventListener("contextmenu", e => e.preventDefault());
+    }
+
+    function autoLockExam() {
+        isExamActive = false;
+        clearInterval(timerInterval);
+        localStorage.setItem(EXAM_STORAGE_KEY, "finished");
+        
+        // قطع دسترسی به دوربین
+        stopCamera();
+        showBlockedScreen();
+    }
+
+    function stopCamera() {
+        const video = document.getElementById("webcam-preview");
+        if (video.srcObject) {
+            video.srcObject.getTracks().forEach(track => track.stop());
+        }
+    }
+
+    function submitExam(isAutoSubmit) {
+        const studentName = document.getElementById("student-name").value.trim();
+        if (!isAutoSubmit && studentName === "") {
+            alert("لطفاً نام و نام خانوادگی خود را وارد کنید.");
+            document.getElementById("student-name").focus();
+            return;
+        }
+
+        // گرفتن عکس نهایی در لحظه ثبت آزمون
+        takeSnapshot("عکس نهایی زمان ثبت");
+
+        isExamActive = false;
+        clearInterval(timerInterval);
+        localStorage.setItem(EXAM_STORAGE_KEY, "finished");
+        stopCamera();
+
+        let score = 0;
+        let reviewHtml = "";
+
+        shuffledQuestions.forEach((item, index) => {
+            const selected = document.querySelector(`input[name="q_${item.id}"]:checked`);
+            const userAns = selected ? parseInt(selected.value) : -1;
+            const isCorrect = (userAns === item.correct);
+            if (isCorrect) score++;
+
+            let statusText = userAns === -1 ? "پاسخ داده نشده ⚪" : (isCorrect ? "پاسخ صحیح ✅" : "پاسخ نادرست ❌");
+            let userAnsText = userAns === -1 ? "—" : item.options[userAns];
+
+            reviewHtml += `
+                <div class="question-card ${isCorrect ? 'correct-ans' : 'wrong-ans'}">
+                    <div class="question-title">سوال ${index + 1}: ${item.q}</div>
+                    <p><strong>وضعیت:</strong> ${statusText}</p>
+                    <p><strong>انتخاب شما:</strong> ${userAnsText}</p>
+                    <p><strong>گزینه صحیح:</strong> ${item.options[item.correct]}</p>
+                    <div class="explanation">
+                        <strong>💡 پاسخ تشریحی:</strong><br>
+                        ${item.explanation}
+                    </div>
+                </div>
+            `;
+        });
+
+        const finalName = studentName || "دانش‌آموز نامشخص";
+        const percentage = Math.round((score / shuffledQuestions.length) * 100);
+        const grade20 = ((score / shuffledQuestions.length) * 20).toFixed(2);
+
+        document.getElementById("exam-section").classList.add("hidden");
+        document.getElementById("result-section").classList.remove("hidden");
+
+        document.getElementById("score-summary").innerHTML = `
+            <div style="font-size: 22px; font-weight: bold; margin-bottom: 10px;">نتایج آزمون درس ریاضی دهم</div>
+            <strong>دانش‌آموز:</strong> ${finalName} <br>
+            <strong>تعداد پاسخ‌های صحیح:</strong> ${score} از ${shuffledQuestions.length} <br>
+            <strong>نمره نهایی:</strong> <span style="color: var(--primary); font-size: 24px; font-weight: bold;">${grade20} از ۲۰</span> (${percentage}٪)
+        `;
+
+        // نمایش وضعیت عکس‌های گرفته شده برای اطمینان دبیر
+        document.getElementById("capture-status").innerText = `📸 تعداد ${capturedPhotos.length} تصویر امنیتی در طول آزمون از شما ثبت شد.`;
+
+        document.getElementById("answers-review").innerHTML = reviewHtml;
+        window.scrollTo(0, 0);
+    }
+
+    // تبدیل کارنامه به عکس و دانلود آن جهت ارسال به معلم
+    function captureAndDownload() {
+        const wrapper = document.getElementById("exam-container-wrapper");
+        const downloadBtn = document.getElementById("download-btn");
+        
+        // پنهان کردن دکمه دانلود در عکس نهایی کارنامه
+        downloadBtn.style.display = "none";
+
+        html2canvas(wrapper, { useCORS: true, scale: 2 }).then(canvas => {
+            const link = document.createElement("a");
+            link.download = "Karnameh_Math_Ahmadi.png";
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+            
+            // بازگرداندن دکمه
+            downloadBtn.style.display = "block";
+        }).catch(err => {
+            alert("خطا در ایجاد عکس کارنامه. لطفاً به صورت دستی اسکرین‌شات بگیرید.");
+            downloadBtn.style.display = "block";
+        });
+    }
+</script>
+
+</body>
+</html>
